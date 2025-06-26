@@ -465,10 +465,7 @@ def fetch_crossref_data(crossref_id):
         print(f"Error connecting to Crossref API: {e}")
         return None
 
-
-def main():
-    email = input("Enter the email address: ")
-
+def find_org_associated_with_email(email: str) -> None:
     # Extract domain from email for DNS analysis
     email_domain = get_domain_from_email(email)
 
@@ -558,6 +555,9 @@ def main():
 
         print("\n" + "-" * 80)
 
+def main():
+    email = input("Enter the email address: ")
+    find_org_associated_with_email(email)
 
 if __name__ == "__main__":
     main()
