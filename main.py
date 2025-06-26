@@ -465,7 +465,8 @@ def fetch_crossref_data(crossref_id):
         print(f"Error connecting to Crossref API: {e}")
         return None
 
-def find_org_associated_with_email(email: str) -> None:
+def find_org_associated_with_email(email: str, result_display_limit: int =
+None) -> None:
     # Extract domain from email for DNS analysis
     email_domain = get_domain_from_email(email)
 
@@ -502,10 +503,19 @@ def find_org_associated_with_email(email: str) -> None:
 
     scored_results.sort(key=lambda x: x[1]["total"], reverse=True)
 
+    if not result_display_limit or result_display_limit < 0:
+        result_display_limit = len(scored_results)
+
+    if result_display_limit < len(scored_results):
+        print(f"Limiting the displayed results to {result_display_limit}")
+
     print("\nOrganization Matches:")
     print("=" * 80)
 
     for i, (result, score_breakdown, dns_results_for_result) in enumerate(scored_results, start=1):
+        if i > result_display_limit:
+            break
+
         crossref_id = result.get('external_ids', {}).get('FundRef', {}).get('all', ['N/A'])[0]
         crossref_data = fetch_crossref_data(crossref_id) if crossref_id != 'N/A' else None
 
