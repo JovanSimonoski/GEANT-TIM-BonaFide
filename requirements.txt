@@ -1,8 +1,0 @@
-# Core HTTP library for API requests
-requests>=2.25.1
-
-# DNS resolution and query library
-dnspython>=2.1.0
-
-# Domain extraction and parsing utility
-tldextract>=3.1.0
