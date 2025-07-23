@@ -1,9 +1,9 @@
-from ror_email_match.clients.dns_analyzer import DNSAnalyzer
+from ror_email_match.clients.dns_client import DNSAnalyzer
 from ror_email_match.clients.ror_client import RORClient
 from ror_email_match.clients.crossref_client import CrossrefClient
+from ror_email_match.clients.whois_client import WHOISClient
 from ror_email_match.scoring.match_scorer import MatchScorer
 from ror_email_match.output.output_formatter import OutputFormatter
-
 
 """
       |   
@@ -27,7 +27,7 @@ class OrganizationFinder:
         """
         Initialize the OrganizationFinder with all required client components.
 
-        Creates instances of DNSAnalyzer, RORClient, CrossrefClient, MatchScorer,
+        Creates instances of DNSAnalyzer, RORClient, CrossrefClient, WHOISClient, MatchScorer,
         and OutputFormatter for comprehensive organization identification.
 
         Parameters:
@@ -39,6 +39,7 @@ class OrganizationFinder:
         self.dns_analyzer = DNSAnalyzer()
         self.ror_client = RORClient()
         self.crossref_client = CrossrefClient()
+        self.whois_client = WHOISClient()
         self.match_scorer = MatchScorer()
         self.output_formatter = OutputFormatter()
 
@@ -87,14 +88,24 @@ class OrganizationFinder:
         scored_results = []
         for result in results:
             dns_results_for_result = initial_dns_results.copy()
+            whois_results_for_result = None
+
             if result.get('links'):
                 website_domain = self.dns_analyzer.get_domain_from_url(result['links'][0])
                 if website_domain != email_domain:
                     dns_results_for_result = self.dns_analyzer.run_dns_analysis(email_domain, website_domain)
 
+                # Perform WHOIS comparison between email domain and website domain
+                whois_match_score, whois_matches = self.whois_client.compare_domains(email_domain, website_domain)
+                whois_results_for_result = {
+                    "match_score": whois_match_score,
+                    "matches": whois_matches
+                }
+
             scored_results.append(
-                (result, self.match_scorer.calculate_match_score(email, result, dns_results_for_result),
-                 dns_results_for_result))
+                (result, self.match_scorer.calculate_match_score(email, result, dns_results_for_result,
+                                                                 whois_results_for_result),
+                 dns_results_for_result, whois_results_for_result))
 
         scored_results.sort(key=lambda x: x[1]["total"], reverse=True)
 

@@ -1,5 +1,5 @@
 import tldextract
-from ror_email_match.clients.dns_analyzer import DNSAnalyzer
+from ror_email_match.clients.dns_client import DNSAnalyzer
 
 """
       |   
@@ -16,7 +16,7 @@ class MatchScorer:
     Calculates match scores between email domains and organization results from ROR.
 
     This class evaluates how well an email domain matches with potential organization
-    results by analyzing domain relationships, DNS records, and external identifiers
+    results by analyzing domain relationships, DNS records, WHOIS data, and external identifiers
     to produce a comprehensive scoring system.
     """
 
@@ -32,11 +32,11 @@ class MatchScorer:
         """
         self.dns_analyzer = DNSAnalyzer()
 
-    def calculate_match_score(self, email, result, dns_results=None):
+    def calculate_match_score(self, email, result, dns_results=None, whois_results=None):
         """
         Calculate a comprehensive match score between an email and an organization result.
 
-        Analyzes domain relationships, DNS similarities, and external identifiers to
+        Analyzes domain relationships, DNS similarities, WHOIS data, and external identifiers to
         determine how likely it is that the email belongs to the organization.
 
         Parameters:
@@ -45,6 +45,8 @@ class MatchScorer:
                           and external_ids.
             dns_results (dict, optional): DNS analysis results from DNSAnalyzer.run_dns_analysis().
                                         If provided, enables DNS verification bonuses.
+            whois_results (dict, optional): WHOIS comparison results containing match_score and matches.
+                                          If provided, enables WHOIS verification bonuses.
 
         Returns:
             dict: Score breakdown containing:
@@ -58,6 +60,7 @@ class MatchScorer:
                  - crossref_bonus: 0-5 points for having Crossref data
                  - dns_verification_bonus: 0-10 points for DNS record matches
                  - dns_similarity_bonus: 0-15 points based on overall DNS similarity
+                 - whois_bonus: 0-20 points based on WHOIS data matches
                  - total: Sum of all score components
         """
         score_breakdown = {
@@ -71,11 +74,18 @@ class MatchScorer:
             "crossref_bonus": 0,
             "dns_verification_bonus": 0,
             "dns_similarity_bonus": 0,
+            "whois_bonus": 0,
             "total": 0
         }
 
         email_full_domain = email.split('@')[-1]
         email_parts = tldextract.extract(email_full_domain)
+
+        # Add WHOIS verification bonus if applicable
+        if whois_results:
+            whois_match_score = whois_results.get("match_score", 0)
+            # Map WHOIS match score (0-100) to bonus points (0-20)
+            score_breakdown["whois_bonus"] = min(20, whois_match_score // 5)
 
         # Add DNS verification bonus if applicable
         if dns_results:

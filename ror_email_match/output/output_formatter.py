@@ -12,7 +12,7 @@ class OutputFormatter:
     """
     Handles formatting and display of organization finder results.
 
-    This class provides methods to present DNS analysis comparisons, organization matches,
+    This class provides methods to present DNS analysis comparisons, WHOIS comparisons, organization matches,
     and scoring breakdowns in a structured, readable format for console output.
     """
 
@@ -66,6 +66,42 @@ class OutputFormatter:
             print(f"              Email SPF: {similarities["email_spf"]}")
             print(f"              Website SPF: {similarities["website_spf"]}")
 
+    def print_whois_comparison(self, whois_results, email_domain, website_domain):
+        """Print WHOIS comparison results in a formatted way"""
+        if not whois_results:
+            print(f"\n   WHOIS Comparison")
+            print(f"   No comparison available (same domain: {email_domain})")
+            return
+
+        print(f"\n   WHOIS Comparison: {email_domain} and {website_domain}")
+        print("   " + "-" * 60)
+
+        match_score = whois_results.get("match_score", 0)
+        matches = whois_results.get("matches", {})
+
+        print(f"\n       WHOIS Match Score: {match_score}/100")
+
+        if matches.get("domain_name"):
+            print(f"\n       Matching Domain Name:")
+            print(f"       - {matches['domain_name']}")
+
+        if matches.get("org"):
+            print(f"\n       Matching Organization:")
+            print(f"       - {matches['org']}")
+
+        if matches.get("name"):
+            print(f"\n       Matching Registrant Name:")
+            print(f"       - {matches['name']}")
+
+        if matches.get("address"):
+            print(f"\n       Matching Address:")
+            print(f"       - {matches['address']}")
+
+        if matches.get("emails"):
+            print(f"\n       Matching Emails:")
+            for email in matches['emails']:
+                print(f"       - {email}")
+
     def print_individual_dns_analysis(self, dns_results, email_domain, dns_analyzer):
         """
         Print DNS analysis results for individual organization matches.
@@ -90,6 +126,26 @@ class OutputFormatter:
         else:
             self.print_dns_comparison(None, email_domain, email_domain)
 
+    def print_individual_whois_analysis(self, whois_results, email_domain, website_domain):
+        """
+        Print WHOIS analysis results for individual organization matches.
+
+        Displays WHOIS comparison between email domain and organization website domain,
+        or indicates when domains are identical.
+
+        Parameters:
+            whois_results (dict): WHOIS analysis results containing match_score and matches.
+            email_domain (str): The email domain being analyzed.
+            website_domain (str): The website domain being compared.
+
+        Returns:
+            None
+        """
+        if whois_results and email_domain != website_domain:
+            self.print_whois_comparison(whois_results, email_domain, website_domain)
+        else:
+            self.print_whois_comparison(None, email_domain, email_domain)
+
     def print_dns_analysis(self, results, dns_analyzer):
         """
         Print general DNS analysis results.
@@ -111,7 +167,7 @@ class OutputFormatter:
         print("\nOrganization Matches:")
         print("=" * 80)
 
-        for i, (result, score_breakdown, dns_results_for_result) in enumerate(scored_results, start=1):
+        for i, (result, score_breakdown, dns_results_for_result, whois_results_for_result) in enumerate(scored_results, start=1):
             if i > result_display_limit:
                 break
 
@@ -142,6 +198,7 @@ class OutputFormatter:
 
             print(
                 f"      DNS Similarity Bonus                : {score_breakdown['dns_similarity_bonus']:>3}/15  points")
+            print(f"      WHOIS Bonus                         : {score_breakdown['whois_bonus']:>3}/20  points")
             print(f"      Crossref Bonus                      : {score_breakdown['crossref_bonus']:>3}/5   points")
 
             print(f"\n   Crossref ID: {crossref_id}")
@@ -159,5 +216,10 @@ class OutputFormatter:
                     print(f"      Also known as: {preview}{suffix}")
 
             self.print_individual_dns_analysis(dns_results_for_result, email_domain, dns_analyzer)
+
+            # Print WHOIS analysis if available
+            if whois_results_for_result and result.get('links'):
+                website_domain = dns_analyzer.get_domain_from_url(result['links'][0])
+                self.print_individual_whois_analysis(whois_results_for_result, email_domain, website_domain)
 
             print("\n" + "-" * 80)
