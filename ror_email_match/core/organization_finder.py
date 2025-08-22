@@ -84,6 +84,8 @@ class OrganizationFinder:
 
         print(f"\nFound {len(results)} potential organization matches")
 
+        results = self.ror_client.aggregate_links(results)
+
         # Score and sort results
         scored_results = []
         for result in results:

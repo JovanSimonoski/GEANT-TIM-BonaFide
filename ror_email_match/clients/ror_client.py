@@ -69,9 +69,9 @@ class RORClient:
 
         queries = []
         if suffix.split('.')[-1] in self.tlds:
-            base_query = f"https://api.ror.org/organizations?query.advanced=country.country_code:{suffix.upper()}%20AND%20links:"
+            base_query = f"https://api.ror.org/v2/organizations?query.advanced=locations.geonames_details.country_code:{suffix.upper()}%20AND%20links.type:website%20AND%20links.value:"
         else:
-            base_query = f"https://api.ror.org/organizations?query.advanced=links:"
+            base_query = f"https://api.ror.org/v2/organizations?query.advanced=links.type:website%20AND%20links.value:"
 
         # Generate all possible domain variants, including intermediate subdomains
         domain_variants = set()
@@ -111,4 +111,27 @@ class RORClient:
                     results.extend(data.get("items", []))
             except requests.RequestException as e:
                 print(f"Error fetching data from {query}: {e}")
+        return results
+
+    def aggregate_links(self, results):
+        """
+        Aggregate links from the results into the v1 API structure.
+
+        Parameters:
+              results (dict): Results from ROR API.
+
+        Returns:
+              dict: Results from ROR API with aggregated links into the v1 ROR API structure.
+        """
+        for result in results:
+            links = []
+            if result["links"] is not None:
+                for link in result["links"]:
+                    if link["type"] == "website":
+                        links.append(link["value"])
+            if result["domains"] is not None:
+                for link in result["domains"]:
+                    links.append(link)
+            result["links"] = links
+
         return results

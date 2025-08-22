@@ -341,7 +341,6 @@ class DNSAnalyzer:
 
             similarities["spf_similarity"] = includes_match or ip_match
 
-        # TODO: FIX THE SCORE (SIMULTANEOUS MATCHES)
         relation_score = 0
 
         if similarities["matching_nameservers"]:

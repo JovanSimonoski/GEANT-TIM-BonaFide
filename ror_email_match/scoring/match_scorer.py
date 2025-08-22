@@ -138,7 +138,12 @@ class MatchScorer:
                 score_breakdown["domain_match"] = max(score_breakdown["domain_match"], 80)
 
                 # Crossref Data Bonus
-                crossref_id = result.get('external_ids', {}).get('FundRef', {}).get('all', ['N/A'])[0]
+                external_ids = result.get('external_ids', {})
+                crossref_id = 'N/A'
+                for external_id in external_ids:
+                    if external_id["type"] == "fundref":
+                        crossref_id = external_id["all"][0]
+
                 if crossref_id != 'N/A':
                     score_breakdown["crossref_bonus"] = 5
 

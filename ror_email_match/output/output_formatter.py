@@ -171,7 +171,11 @@ class OutputFormatter:
             if i > result_display_limit:
                 break
 
-            crossref_id = result.get('external_ids', {}).get('FundRef', {}).get('all', ['N/A'])[0]
+            external_ids = result.get('external_ids', {})
+            crossref_id = 'N/A'
+            for external_id in external_ids:
+                if external_id["type"] == "fundref":
+                    crossref_id = external_id["all"][0]
             crossref_data = crossref_client.fetch_crossref_data(crossref_id) if crossref_id != 'N/A' else None
 
             print(f"\n{i}. {result.get('name')}")
