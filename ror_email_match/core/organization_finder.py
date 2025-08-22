@@ -1,3 +1,5 @@
+from typing import Any
+
 from ror_email_match.clients.dns_client import DNSAnalyzer
 from ror_email_match.clients.ror_client import RORClient
 from ror_email_match.clients.crossref_client import CrossrefClient
@@ -43,7 +45,7 @@ class OrganizationFinder:
         self.match_scorer = MatchScorer()
         self.output_formatter = OutputFormatter()
 
-    def find_org_associated_with_email(self, email: str, result_display_limit: int = None) -> None:
+    def find_org_associated_with_email(self, email: str, result_display_limit: int = None) -> dict[str, Any]:
         """
         Find and display organizations associated with the given email address.
 
@@ -60,7 +62,7 @@ class OrganizationFinder:
                                                  If None or negative, displays all results.
 
         Returns:
-            None: Results are printed to console via OutputFormatter.
+            dict: Results in dict format. Results are also printed to console via OutputFormatter.
         """
         # Extract domain from email for DNS analysis
         email_domain = self.dns_analyzer.get_domain_from_email(email)
@@ -121,3 +123,5 @@ class OrganizationFinder:
             scored_results, result_display_limit, email_domain,
             self.dns_analyzer, self.crossref_client
         )
+
+        return {"ror_scored_results": scored_results}
