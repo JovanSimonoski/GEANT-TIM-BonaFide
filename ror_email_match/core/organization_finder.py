@@ -7,6 +7,8 @@ from ror_email_match.clients.whois_client import WHOISClient
 from ror_email_match.scoring.match_scorer import MatchScorer
 from ror_email_match.output.output_formatter import OutputFormatter
 
+import json
+
 """
       |   
   \  ___  /                           _________
@@ -124,4 +126,6 @@ class OrganizationFinder:
             self.dns_analyzer, self.crossref_client
         )
 
+        print("------------------"*5)
+        print(json.dumps(scored_results, indent=4, sort_keys=True))
         return {"ror_scored_results": scored_results}

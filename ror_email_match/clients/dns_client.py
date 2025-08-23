@@ -171,7 +171,12 @@ class DNSAnalyzer:
         """
         try:
             answers = dns.resolver.resolve(domain, 'TXT')
-            return [r.strings for r in answers]
+            result = []
+            for r in answers:
+                if r.strings is not None:
+                    s = r.strings[0].decode()
+                    result.append(s)
+            return result
         except Exception:
             return []
 
@@ -188,9 +193,8 @@ class DNSAnalyzer:
             str or None: The SPF record as a decoded string, or None if no SPF record found.
         """
         for record_set in records:
-            for record in record_set:
-                if b'v=spf1' in record:
-                    return record.decode()
+            if 'v=spf1' in record_set:
+                return record_set
         return None
 
     def run_dns_analysis(self, email_domain, website_domain=None):
