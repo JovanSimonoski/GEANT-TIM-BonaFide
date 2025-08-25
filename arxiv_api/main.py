@@ -38,8 +38,8 @@ def main():
         print(f"Number of collaborations: {G.number_of_edges()}")
 
         GraphClient.save_edges_to_csv(G, author_name, max_depth)
-        # GraphClient.save_edges_to_json(G, author_name, max_depth)
-        GraphClient.save_edges_to_sigma_json(G, author_name, max_depth)
+        GraphClient.save_edges_to_json(G, author_name, max_depth)
+        # GraphClient.save_edges_to_sigma_json(G, author_name, max_depth)
         GraphClient.visualize_network(G, author_name, max_depth)
 
     except Exception as e:

@@ -71,7 +71,7 @@ class GraphClient:
             if depth >= max_depth:
                 continue
 
-            results = ArxivClient.search_arxiv_publications(current_author)
+            results = ArxivClient.search_arxiv_publications(current_author,2)
 
             if not results:
                 continue
@@ -101,7 +101,7 @@ class GraphClient:
             max_depth (int): The depth parameter used in network construction for filename labeling.
 
         Returns:
-            None: Creates and saves a high-resolution network visualization to '../images_database/'
+            None: Creates and saves a high-resolution network visualization to '../arxiv-data/images_database/'
                  with filename format 'collaboration_network_[author]_depth_[depth].png'.
                  Displays the graph and prints save confirmation message.
         """
@@ -121,7 +121,7 @@ class GraphClient:
         plt.tight_layout()
         plt.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.05)
 
-        filename = "../images_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
+        filename = "../arxiv-data/images_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
             max_depth) + ".png"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
@@ -144,12 +144,12 @@ class GraphClient:
             max_depth (int): The network depth parameter for filename labeling.
 
         Returns:
-            None: Creates CSV file in '../csv_database/' directory with format
+            None: Creates CSV file in '../arxiv-data/csv_database/' directory with format
                  'collaboration_network_[author]_depth_[depth].csv' containing
                  two columns: 'Author1' and 'Author2' representing each collaboration edge.
                  Prints confirmation message with full file path.
         """
-        filename = "../csv_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
+        filename = "../arxiv-data/csv_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
             max_depth) + ".csv"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
@@ -175,12 +175,12 @@ class GraphClient:
             max_depth (int): The network exploration depth for filename identification.
 
         Returns:
-            None: Creates JSON file in '../json_database/' with structure containing
+            None: Creates JSON file in '../arxiv-data/json_database/' with structure containing
                  array of objects with 'source' and 'target' fields for each collaboration.
                  File saved as 'collaboration_network_[author]_depth_[depth].json'.
                  Prints save confirmation message.
         """
-        filename = "../json_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
+        filename = "../arxiv-data/json_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
             max_depth) + ".json"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
@@ -205,11 +205,11 @@ class GraphClient:
 
         Returns:
             None: Creates Sigma.js format JSON file containing 'nodes' array with id/label fields
-                 and 'edges' array with id/source/target fields. Saved to '../sigma_json_database/'
+                 and 'edges' array with id/source/target fields. Saved to '../arxiv-data/sigma_json_database/'
                  as 'collaboration_network_[author]_depth_[depth].json'.
                  Overwrites basic JSON format. Prints confirmation message.
         """
-        filename = "../sigma_json_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
+        filename = "../arxiv-data/sigma_json_database/" + "collaboration_network_" + author.replace(" ", "") + "_depth_" + str(
             max_depth) + ".json"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
@@ -224,13 +224,13 @@ class GraphClient:
         print(f"Collaboration edges saved to {filename}")
 
     @staticmethod
-    def load_all_csv_edges(csv_folder="../csv_database"):
+    def load_all_csv_edges(csv_folder="../arxiv-data/csv_database"):
         """
         Load and combine multiple CSV edge files into a single collaboration network graph.
 
         Parameters:
             csv_folder (str): Path to directory containing CSV files with collaboration edges
-                             (default: "../csv_database"). Files should have 'Author1,Author2' format
+                             (default: "../arxiv-data/csv_database"). Files should have 'Author1,Author2' format
                              with header row.
 
         Returns:
