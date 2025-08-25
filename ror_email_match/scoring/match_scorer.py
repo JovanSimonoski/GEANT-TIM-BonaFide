@@ -131,6 +131,7 @@ class MatchScorer:
             if email_parts.fqdn == result_fqdn:
                 score_breakdown["fully_qualified_domain_name_match"] = max(
                     score_breakdown["fully_qualified_domain_name_match"], 100)
+                score_breakdown["total"] = 100
                 return score_breakdown
 
             # Domain Match

@@ -178,7 +178,10 @@ class OutputFormatter:
                     crossref_id = external_id["all"][0]
             crossref_data = crossref_client.fetch_crossref_data(crossref_id) if crossref_id != 'N/A' else None
 
-            print(f"\n{i}. {result.get('name')}")
+            if result.get('names') is not None:
+                print(f"\n{i}. {result.get('names')[0]['value']}")
+            else:
+                print("No name found")
             print(f"   Match Score: {score_breakdown['total']}%")
             print(f"   Website(s): {', '.join(result.get('links', []))}")
 
