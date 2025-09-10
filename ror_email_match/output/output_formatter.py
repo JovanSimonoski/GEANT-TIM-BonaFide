@@ -194,9 +194,9 @@ class OutputFormatter:
                 print(
                     f"         Email is Subdomain of Website    : {score_breakdown['email_is_subdomain_of_website_domain']:>3}/10  points")
                 print(
-                    f"         Website is Subdomain of Email    : {score_breakdown['website_is_subdomain_of_email_domain']:>3}/-10 points")
+                    f"         Website is Subdomain of Email    : {score_breakdown['website_is_subdomain_of_email_domain']:>3}/-50 points")
                 print(
-                    f"         Subdomain Mismatch Penalty       : {score_breakdown['subdomain_mismatch']:>3}/-10 points")
+                    f"         Subdomain Mismatch Penalty       : {score_breakdown['subdomain_mismatch']:>3}/-50 points")
             else:
                 print(
                     f"      Email in Website Subdomain          : {score_breakdown['domain_of_email_in_website_subdomain']:>3}/20  points")
@@ -204,8 +204,8 @@ class OutputFormatter:
                     f"      Website in Email Subdomain          : {score_breakdown['domain_of_website_in_email_subdomain']:>3}/20  points")
 
             print(
-                f"      DNS Similarity Bonus                : {score_breakdown['dns_similarity_bonus']:>3}/15  points")
-            print(f"      WHOIS Bonus                         : {score_breakdown['whois_bonus']:>3}/20  points")
+                  f"      DNS Bonus                           : {score_breakdown['dns_similarity_bonus']:>3}/30  points")
+            print(f"      WHOIS Bonus                         : {score_breakdown['whois_bonus']:>3}/30  points")
             print(f"      Crossref Bonus                      : {score_breakdown['crossref_bonus']:>3}/5   points")
 
             print(f"\n   Crossref ID: {crossref_id}")

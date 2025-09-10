@@ -84,8 +84,7 @@ class MatchScorer:
         # Add WHOIS verification bonus if applicable
         if whois_results:
             whois_match_score = whois_results.get("match_score", 0)
-            # Map WHOIS match score (0-100) to bonus points (0-20)
-            score_breakdown["whois_bonus"] = min(20, whois_match_score // 5)
+            score_breakdown["whois_bonus"] = min(30, whois_match_score // 3)
 
         # Add DNS verification bonus if applicable
         if dns_results:
@@ -96,8 +95,8 @@ class MatchScorer:
 
                 # Temporary DNS lookup for the website
                 try:
-                    website_a_records = set(self.dns_analyzer.get_a_records(link_domain))
-
+                    # website_a_records = set(self.dns_analyzer.get_a_records(link_domain))
+                    website_a_records = set(dns_results["website_domain"]["a_records"])
                     # If there's any overlap in A records, it's a good sign they belong to the same organization
                     if email_a_records.intersection(website_a_records) and email_a_records and website_a_records:
                         score_breakdown["dns_verification_bonus"] = 10
@@ -116,10 +115,10 @@ class MatchScorer:
             if "website_domain" in dns_results:
                 similarities = self.dns_analyzer.compare_dns_results(dns_results)
                 if similarities:
-                    # Map the relation score from compare_dns_results (0-100) to a bonus (0-15)
                     relation_score = similarities["relation_score"]
-                    score_breakdown["dns_similarity_bonus"] = min(15, relation_score // 7)  # Max bonus of 15 points
+                    score_breakdown["dns_similarity_bonus"] = min(30, relation_score // 3)  # Max bonus of 30 points
 
+        # Domain match check
         for link in result.get('links', []):
             result_parts = tldextract.extract(link)
             result_fqdn = result_parts.fqdn
@@ -144,14 +143,13 @@ class MatchScorer:
                 for external_id in external_ids:
                     if external_id["type"] == "fundref":
                         crossref_id = external_id["all"][0]
-
                 if crossref_id != 'N/A':
                     score_breakdown["crossref_bonus"] = 5
 
                 # Both Have Subdomains
                 if email_parts.subdomain and (result_parts.subdomain and result_parts.subdomain != "www"):
                     score_breakdown["subdomain_mismatch"] = min(
-                        score_breakdown["subdomain_mismatch"], -10)
+                        score_breakdown["subdomain_mismatch"], -50)
 
                 # Email Has Subdomain
                 if email_parts.subdomain and (not result_parts.subdomain or result_parts.subdomain == "www"):
@@ -161,7 +159,7 @@ class MatchScorer:
                 # Website Has Subdomain
                 if not email_parts.subdomain and (result_parts.subdomain and result_parts.subdomain != "www"):
                     score_breakdown["website_is_subdomain_of_email_domain"] = min(
-                        score_breakdown["website_is_subdomain_of_email_domain"], -10)
+                        score_breakdown["website_is_subdomain_of_email_domain"], -50)
 
             # Domain Mismatch
             else:
@@ -182,6 +180,6 @@ class MatchScorer:
                         score_breakdown["domain_of_email_in_website_subdomain"] = max(
                             score_breakdown["domain_of_email_in_website_subdomain"], 20)
 
-        score_breakdown["total"] = sum(score_breakdown.values())
+        score_breakdown["total"] = min(sum(score_breakdown.values()), 100)
 
         return score_breakdown

@@ -346,25 +346,32 @@ class DNSAnalyzer:
             similarities["spf_similarity"] = includes_match or ip_match
 
         relation_score = 0
+        simultaneous_matches = 0
 
         if similarities["matching_nameservers"]:
             relation_score += 25 * min(len(similarities["matching_nameservers"]), 2)
+            simultaneous_matches += 1
 
         if similarities["matching_a_records"]:
             relation_score += 30
+            simultaneous_matches += 1
 
         if similarities["matching_aaaa_records"]:
-            relation_score += 15
+            relation_score += 30
+            simultaneous_matches += 1
 
         if similarities["matching_mx_records"]:
             relation_score += 20
+            simultaneous_matches += 1
 
         if similarities["soa_email_relation"]:
-            relation_score += 10
+            relation_score += 20
+            simultaneous_matches += 1
 
         if similarities["spf_similarity"]:
             relation_score += 10
+            simultaneous_matches += 1
 
-        similarities["relation_score"] = min(relation_score, 100)
+        similarities["relation_score"] = min(min(relation_score, 100) * simultaneous_matches, 100)
 
         return similarities

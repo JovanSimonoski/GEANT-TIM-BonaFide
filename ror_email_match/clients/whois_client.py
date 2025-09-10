@@ -14,7 +14,6 @@ class WHOISClient:
         result = whois.whois(domain)
 
         relevant_fields = {
-            "domain_name": result.domain_name,
             "org": result.org,
             "name": result.name,
             "emails": result.emails,
@@ -38,11 +37,6 @@ class WHOISClient:
         results = {}
         match_score = 0
 
-        if ((domain1_results['domain_name'] == domain2_results['domain_name']) and
-                domain1_results['domain_name'] is not None and domain2_results['domain_name'] is not None):
-            results['domain_name'] = domain1_results['domain_name']
-            match_score += 100
-
         if ((domain1_results['org'] == domain2_results['org']) and
                 domain1_results['org'] is not None and domain2_results['org'] is not None):
             results['org'] = domain1_results['org']
@@ -51,7 +45,7 @@ class WHOISClient:
         if ((domain1_results['name'] == domain2_results['name']) and
                 domain1_results['name'] is not None and domain2_results['name'] is not None):
             results['name'] = domain1_results['name']
-            match_score += 100
+            match_score += 80
 
         if (((domain1_results['address'] == domain2_results['address']) and
              domain1_results['address'] is not None and domain2_results['address'] is not None) and
@@ -76,4 +70,4 @@ class WHOISClient:
                         results['emails'].append(email1)
             match_score += 80
 
-        return match_score % 100, results
+        return min(match_score, 100), results

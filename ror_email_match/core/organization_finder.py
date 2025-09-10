@@ -101,12 +101,12 @@ class OrganizationFinder:
                 if website_domain != email_domain:
                     dns_results_for_result = self.dns_analyzer.run_dns_analysis(email_domain, website_domain)
 
-                # Perform WHOIS comparison between email domain and website domain
-                whois_match_score, whois_matches = self.whois_client.compare_domains(email_domain, website_domain)
-                whois_results_for_result = {
-                    "match_score": whois_match_score,
-                    "matches": whois_matches
-                }
+                    # Perform WHOIS comparison between email domain and website domain
+                    whois_match_score, whois_matches = self.whois_client.compare_domains(email_domain, website_domain)
+                    whois_results_for_result = {
+                        "match_score": whois_match_score,
+                        "matches": whois_matches
+                    }
 
             scored_results.append(
                 (result, self.match_scorer.calculate_match_score(email, result, dns_results_for_result,
